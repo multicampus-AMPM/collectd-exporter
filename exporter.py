@@ -9,6 +9,7 @@ from flask import Flask, request
 from prometheus_flask_exporter import PrometheusMetrics
 import json
 import argparse
+import os
 
 
 def new_name(vl, idx):
@@ -166,7 +167,7 @@ def parse_config():
     parser.add_argument('--addr', metavar='addr', type=str, help='the address of predictor')
     args = parser.parse_args()
 
-    # TODO regex validation
+    
     if args.host is None:
         args.host = '0.0.0.0'
     if args.port is None:
@@ -175,8 +176,22 @@ def parse_config():
     return args
 
 
+def parse_env():
+    # use get function instead of key reference to avoid error
+    host = os.environ.get('host')
+    port = os.environ.get('port')
+    addr = os.environ.get('addr')
+
+    # TODO regex validation
+    if host is None:
+        os.environ['host'] = '0.0.0.0'
+    if port is None:
+        os.environ['port'] = 9103
+
+
 if __name__ == '__main__':
-    args = parse_config()
+    # args = parse_config()
+    parse_env()
     collector.start()
     exporter.registry.register(CollectdExporter(collector))
-    app.run(host=args.host, port=args.port)
+    app.run(host=os.environ.get('host'), port=os.environ.get('port'))
