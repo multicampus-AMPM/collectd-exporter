@@ -186,7 +186,7 @@ def parse_env():
     if host is None:
         os.environ['host'] = '0.0.0.0'
     if port is None:
-        os.environ['port'] = 9103
+        os.environ['port'] = '9103'
 
 
 if __name__ == '__main__':
