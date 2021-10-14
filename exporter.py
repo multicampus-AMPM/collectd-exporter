@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily
 from datetime import datetime, timedelta
 import re
