@@ -16,7 +16,19 @@ def new_name(vl, idx):
     else:
         name = 'collectd_' + vl['plugin'] + '_' + vl['type']
     if vl['dsnames'][idx] != 'value':
-        name += '_' + vl['dsnames'][idx]
+        # TODO: dsnames가 숫자인지 확인 필요
+        dsname = vl['dsnames'][idx]
+        if name.startswith('collectd_smart_smart_attribute'):
+            if dsname == '0':
+                dsname = 'current'
+            elif dsname == '1':
+                dsname = 'worst'
+            elif dsname == '2':
+                dsname = 'threshold'
+            elif dsname == '3':
+                dsname = 'pretty'
+        # name += '_' + vl['dsnames'][idx]
+        name += '_' + dsname
     if vl['dstypes'][idx] == 'derive' or vl['dstypes'][idx] == 'counter':
         name += '_total'
     return re.sub(r"[^a-zA-Z0-9_:]", "_", name)
@@ -149,7 +161,6 @@ def collectd_post():
     except:
         app.logger.error("InternalServerError : invalid data from collectd")
         return 'ok'
-    global collector
     collector.set_value_lists(value_list)
     return 'ok'
 
