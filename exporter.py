@@ -14,21 +14,33 @@ def new_name(vl, idx):
     if vl['plugin'] == vl['type']:
         name = 'collectd_' + vl['type']
     else:
+        # case: Type[smart_badsectors, smart_powercycles, smart_poweron, smart_temperature]
+        if vl['type'] in ['smart_badsectors', 'smart_powercycles', 'smart_poweron', 'smart_temperature']:
+            vl['type_instance'] = vl['type'].replace('smart_', '')
+            vl['type'] = 'smart_attribute'
+            vl['dsnames'][idx] = 'pretty'
+            # XXX required current?
         name = 'collectd_' + vl['plugin'] + '_' + vl['type']
+
     if vl['dsnames'][idx] != 'value':
         # TODO: dsnames가 숫자인지 확인 필요
-        dsname = vl['dsnames'][idx]
-        if name.startswith('collectd_smart_smart_attribute'):
-            if dsname == '0':
-                dsname = 'current'
-            elif dsname == '1':
-                dsname = 'worst'
-            elif dsname == '2':
-                dsname = 'threshold'
-            elif dsname == '3':
-                dsname = 'pretty'
-        # name += '_' + vl['dsnames'][idx]
-        name += '_' + dsname
+        # XXX: below line not executed at all
+        # dsname = vl['dsnames'][idx]
+        # if vl['type'] == 'smart_attribute':
+        #     if dsname == '0':
+        #         print(dsname)
+        #         dsname = 'current'
+        #     elif dsname == '1':
+        #         print(dsname)
+        #         dsname = 'worst'
+        #     elif dsname == '2':
+        #         print(dsname)
+        #         dsname = 'threshold'
+        #     elif dsname == '3':
+        #         print(dsname)
+        #         dsname = 'pretty'
+        # name += '_' + dsname
+        name += '_' + vl['dsnames'][idx]
     if vl['dstypes'][idx] == 'derive' or vl['dstypes'][idx] == 'counter':
         name += '_total'
     return re.sub(r"[^a-zA-Z0-9_:]", "_", name)
