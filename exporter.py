@@ -10,21 +10,39 @@ import argparse
 import os
 
 
+WIKI_NAMES = {
+    'reallocated-sector-count':'reallocated-sectors-count',
+    'power-on-hours':'power-on-hours',
+    'power-cycle-count':'power-cycle-count',
+    'wear-leveling-count':'wear-range-delta',
+    'used-reserved-blocks-total':'used-reserved-block-count-total',
+    'program-fail-count-total':'program-fail-count-total',
+    'erase-fail-count-total':'erase-fail-count',
+    'runtime-bad-block-total':'sata-downshift-error-count',
+    'reported-uncorrect':'reported-uncorrectable-errors',
+    'airflow-temperature-celsius':'temperature-difference',
+    'hardware-ecc-recovered':'hardware-ecc-recovered',
+    'udma-crc-error-count':'ultradma-crc-error-count',
+    'good-block-rate':'good-block-count-and-system(free)-block-count',
+    'total-lbas-written':'total-lbas-written',
+    'total-lbas-read':'total-lbas-read'
+}
+
+
 def new_name(vl, idx):
     if vl['plugin'] == vl['type']:
         name = 'collectd_' + vl['type']
     else:
         # case: Type[smart_badsectors, smart_powercycles, smart_poweron, smart_temperature]
+        # XXX 빼야할 수도 있음
         if vl['type'] in ['smart_badsectors', 'smart_powercycles', 'smart_poweron', 'smart_temperature']:
             vl['type_instance'] = vl['type'].replace('smart_', '')
             vl['type'] = 'smart_attribute'
             vl['dsnames'][idx] = 'pretty'
-            # XXX required current?
         name = 'collectd_' + vl['plugin'] + '_' + vl['type']
 
     if vl['dsnames'][idx] != 'value':
-        # TODO: dsnames가 숫자인지 확인 필요
-        # XXX: below line not executed at all
+        # XXX: dsname이 숫자로 안 들어오는데?
         # dsname = vl['dsnames'][idx]
         # if vl['type'] == 'smart_attribute':
         #     if dsname == '0':
@@ -43,6 +61,14 @@ def new_name(vl, idx):
         name += '_' + vl['dsnames'][idx]
     if vl['dstypes'][idx] == 'derive' or vl['dstypes'][idx] == 'counter':
         name += '_total'
+    
+    # modify type instance's value
+    # to identify smart attribute's name as in Wikipedia
+    # ref : https://en.wikipedia.org/wiki/S.M.A.R.T.
+    if vl['type'] == 'smart_attribute':
+        wiki_name = WIKI_NAMES.get(vl['type_instance'])
+        if wiki_name is not None:
+            vl['type_instance'] = wiki_name
     return re.sub(r"[^a-zA-Z0-9_:]", "_", name)
 
 

@@ -1,0 +1,16 @@
+ 5 reallocated-sector-count > Reallocated Sectors Count
+ 9 power-on-hours > Power-On Hours
+ 12 power-cycle-count > Power Cycle Count
+ 177 wear-leveling-count > Wear Range Delta
+ 179 used-reserved-blocks-total > Used Reserved Block Count Total
+ 181 program-fail-count-total > Program Fail Count Total
+ 182 erase-fail-count-total > Erase Fail Count
+ 183 runtime-bad-block-total > SATA Downshift Error Count
+ 187 reported-uncorrect > Reported Uncorrectable Errors
+ 190 airflow-temperature-celsius > Temperature Difference
+ 195 hardware-ecc-recovered > Hardware ECC Recovered
+ 199 udma-crc-error-count > UltraDMA CRC Error Count
+ 235 good-block-rate > Good Block Count AND System(Free) Block Count
+ 241 total-lbas-written > Total LBAs Written
+ 242 total-lbas-read > Total LBAs Read
+
