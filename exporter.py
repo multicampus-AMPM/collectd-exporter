@@ -8,6 +8,9 @@ from prometheus_flask_exporter import PrometheusMetrics
 import json
 import argparse
 import os
+import requests
+import time
+import asyncio
 
 
 WIKI_NAMES = {
@@ -138,6 +141,27 @@ class CollectdExporter(object):
         for metric in wrapper:
             yield wrapper[metric]
 
+        # caller
+        print('working?')
+        asyncio.run(call_predictor())
+
+
+async def call_predictor():
+    """ call the smart-predictor asynchronously """
+    max = 3
+    ticker = 1
+    print(f'[INFO] calling predictor after {max} seconds')
+    # 이게 최초에 항상 실행이 되네? 왜지
+    # metrics 긁어갈떄마다 요청하는거 확인함 근데 왜 이게 최초에 실행되는지 모르겠네
+    # request만 최초에 실행하고 resoponse도 print 안하고 있음
+    while ticker <= max:
+        print(f'[INFO] ticking...{ticker}')
+        time.sleep(ticker)
+        ticker += 1
+    
+    response = requests.get(url=os.environ['addr'], params={'time': time.time(), 'model': 'smart-model', 'query' : ['collectd_smart_smart_attribute_pretty', 'collectd_smart_smart_attribute_current']}, timeout=10)
+    print(response)
+
 
 class CollectdCollector(Thread):
     """ Thread to hold data from collectd """
@@ -203,6 +227,7 @@ def collectd_post():
     return 'ok'
 
 
+@DeprecationWarning
 def parse_config():
     """ cofing parser for command line arguments
         --host : the service host of this app (default: 0.0.0.0)
@@ -234,6 +259,8 @@ def parse_env():
         os.environ['host'] = '0.0.0.0'
     if port is None:
         os.environ['port'] = '9103'
+    if addr is None:
+        os.environ['addr'] = 'http://smart-predictor:9106/predict'
 
 
 if __name__ == '__main__':
