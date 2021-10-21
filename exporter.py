@@ -141,11 +141,8 @@ class CollectdExporter(object):
         for metric in wrapper:
             yield wrapper[metric]
 
-        # caller
-        print('working?')
-        asyncio.run(call_predictor())
 
-
+@DeprecationWarning
 async def call_predictor():
     """ call the smart-predictor asynchronously """
     max = 3
@@ -220,7 +217,7 @@ def collectd_post():
     data = request.data
     try:
         value_list = json.loads(data)
-    except:
+    except: 
         app.logger.error("InternalServerError : invalid data from collectd")
         return 'ok'
     collector.set_value_lists(value_list)
